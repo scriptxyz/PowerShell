@@ -10,14 +10,20 @@ if (![System.IO.File]::Exists($config)) {
 }
 
 Function DeleteUsers {
-    Param ([Parameter(HelpMessage = "Hi Keith")] [string]$UserType = "employee")
+    Param ([Parameter(HelpMessage = "Hi Test")] [string]$UserType = "employee")
     $client = Get-SfClient -Name "c:\temp\sflogin.sfps"
 
     $sfUserObjects = Import-Csv ("C:\temp\" + $UserType + ".csv")
     $count = 0
 
     foreach ($sfUser in $sfUserObjects) {
+
+        Write-Host deleting $sfUser.Email
+	#delete users files without re-assign
         Send-SfRequest -Client $client -Method Delete -Entity Users -Id $sfUser.UserId -Parameters @{"completely" = "true"}
+	#delte users files and re-assign to someone
+        #Send-SfRequest -Client $client -Method Delete -Entity Users -Id $sfUser.UserId -Parameters @{"itemsReassignTo" = "id of user"}
+
         $count = $count + 1
     }
     write-host "$count user accounts were deleted"
@@ -26,9 +32,9 @@ Function DeleteUsers {
 
 Write-host "Deleting disabled users in employee..."
 write-host ""
-write-host ""
 DeleteUsers -UserType "employee";
-Write-host "Deleting disabled users in client..."
 write-host ""
+write-host ""
+Write-host "Deleting disabled users in client..."
 write-host ""
 DeleteUsers -UserType "client";
